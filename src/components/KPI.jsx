@@ -25,11 +25,11 @@ const Percent = styled.li`
   font-weight: 600;
 `;
 
-export default function KPI({ table, title }) {
-  if (table) {
+export default function KPI({ data, title }) {
+  if (data) {
     // Format data point to the desired specifications
-    const value = Math.round(table[0][0].qNum / 1000000);
-    const percent = table[0][1];
+    const value = Math.round(data[0][0].qNum / 1000000);
+    const percent = data[0][1];
     let arrow;
 
     // Change variable that determines the direction of the arrow symbol based on the percentage change

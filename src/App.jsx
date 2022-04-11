@@ -1,11 +1,20 @@
 import styled from 'styled-components';
-import useEnigma from './useEnigma';
-import KPI from './KPI';
-import useQlikConnect from './useQlikConnector';
+import useEnigma from './util/useEnigma';
+import KPI from './components/KPI';
+import Table from './components/Table';
+import useQlikConnect from './util/useQlikConnector';
+import { useEffect } from 'react';
 
-const Wrapper = styled.main`
+const ColContainer = styled.section`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const RowContainer = styled.section`
   display: flex;
   flex-direction: row;
+  align-self: center;
 `;
 
 export default function App() {
@@ -15,21 +24,22 @@ export default function App() {
   // Custom hook
   const enigma = useQlikConnect(appId);
 
+  const table = useEnigma(enigma.doc, 'QJCCUM').qlikData;
+
   // Table data for total revenue
-  const revenueTable = useEnigma(enigma.doc, 'tWJJyZ').qlikData;
+  const revenueData = useEnigma(enigma.doc, 'tWJJyZ').qlikData;
 
   // Table data for total expenses
-  const expensesTable = useEnigma(enigma.doc, 'eMsVVT').qlikData;
+  const expensesData = useEnigma(enigma.doc, 'eMsVVT').qlikData;
 
   // Table data for total profit
-  let profitTable = useEnigma(enigma.doc, 'xWWjCN').qlikData;
+  let profitData = useEnigma(enigma.doc, 'xWWjCN').qlikData;
 
- 
-  if (profitTable) {
+  if (profitData) {
     let profits = [];
 
     // Calculate profit for each quarter
-    profitTable.forEach((row) =>
+    profitData.forEach((row) =>
       profits.push(row[1].qNum - row[2].qNum),
     );
 
@@ -37,30 +47,24 @@ export default function App() {
     const totalProfit = profits.reduce((prev, curr) => prev + curr);
 
     // Format total profit data so that the KPI component can use it
-    profitTable = [
+    profitData = [
       [
         { qNum: totalProfit },
         {
-          qText: profitTable[0][3].qText,
-          qNum: profitTable[0][3].qNum,
+          qText: profitData[0][3].qText,
+          qNum: profitData[0][3].qNum,
         },
       ],
     ];
   }
   return (
-    <Wrapper>
-      <KPI
-        table={revenueTable}
-        title='Total Revenue'
-      />
-      <KPI
-        table={expensesTable}
-        title='Total Expenses'
-      />
-      <KPI
-        table={profitTable}
-        title='Total Profit'
-      />
-    </Wrapper>
+    <ColContainer>
+      <RowContainer>
+        {/* <KPI data={revenueData} title='Total Revenue' />
+        <KPI data={expensesData} title='Total Expenses' />
+        <KPI data={profitData} title='Total Profit' /> */}
+      </RowContainer>
+      <Table data={table} />
+    </ColContainer>
   );
 }
