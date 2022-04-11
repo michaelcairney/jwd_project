@@ -3,7 +3,6 @@ import useEnigma from './util/useEnigma';
 import KPI from './components/KPI';
 import Table from './components/Table';
 import useQlikConnect from './util/useQlikConnector';
-import { useEffect } from 'react';
 
 const ColContainer = styled.section`
   display: flex;
@@ -24,17 +23,19 @@ export default function App() {
   // Custom hook
   const enigma = useQlikConnect(appId);
 
-  const table = useEnigma(enigma.doc, 'QJCCUM').qlikData;
+  // Data for the table component
+  const tableData = useEnigma(enigma.doc, 'QJCCUM').qlikData;
 
-  // Table data for total revenue
+  // Data for total revenue KPI
   const revenueData = useEnigma(enigma.doc, 'tWJJyZ').qlikData;
 
-  // Table data for total expenses
+  // Data for total expenses KPI
   const expensesData = useEnigma(enigma.doc, 'eMsVVT').qlikData;
 
-  // Table data for total profit
+  // Data for total profit KPI
   let profitData = useEnigma(enigma.doc, 'xWWjCN').qlikData;
 
+  // Alter the total profit KPI calculation
   if (profitData) {
     let profits = [];
 
@@ -64,7 +65,7 @@ export default function App() {
         <KPI data={expensesData} title='Total Expenses' />
         <KPI data={profitData} title='Total Profit' /> */}
       </RowContainer>
-      <Table data={table} />
+      {/* <Data data={tableData} /> */}
     </ColContainer>
   );
 }
