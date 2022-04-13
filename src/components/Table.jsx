@@ -11,7 +11,6 @@ const Container = styled.main`
 const Grid = styled.section`
   display: flex;
   flex-direction: row;
-  margin-top: 2rem;
 `;
 
 const Column = styled.section`
@@ -30,8 +29,8 @@ const Item = styled.div`
   text-align: center;
   cursor: default;
   :nth-child(1) {
-    position: fixed;
-    transform: translateY(-2.2rem);
+    position: sticky;
+    top: 0;
     background: #3090df;
     color: white;
     font-weight: 500;

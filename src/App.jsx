@@ -65,7 +65,7 @@ export default function App() {
         <KPI data={expensesData} title='Total Expenses' />
         <KPI data={profitData} title='Total Profit' /> */}
       </RowContainer>
-      {/* <Data data={tableData} /> */}
+      <Table data={tableData} />
     </ColContainer>
   );
 }
