@@ -16,12 +16,7 @@ const Box = styled.section`
 
 // Change colour of percent change based on increase/decrease/no change
 const Percent = styled.li`
-  color: ${(props) =>
-    props.isUp === 'up'
-      ? 'lime'
-      : props.isUp === 'down'
-      ? 'red'
-      : 'darkslategrey'};
+  color: ${(props) => props.color};
   font-weight: 600;
 `;
 
@@ -30,14 +25,18 @@ export default function KPI({ table, title }) {
     // Format data point to the desired specifications
     const value = Math.round(table[0][0].qNum / 1000000);
     const percent = table[0][1];
-    let arrow;
 
-    // Change variable that determines the direction of the arrow symbol based on the percentage change
+    let arrow;
+    let color;
+    // Determine the direction of the arrow symbol and text color based on the percentage change
     if (percent.qNum < 0) {
+      color = 'red';
       arrow = 'down';
     } else if (percent.qNum > 0) {
+      color = 'lime';
       arrow = 'up';
     } else {
+      color = 'darkslategrey';
       arrow = '';
     }
 
@@ -47,7 +46,7 @@ export default function KPI({ table, title }) {
         <strong style={{ fontSize: '1.2rem' }}>
           {value.toLocaleString()} m
         </strong>
-        <Percent isUp={arrow}>
+        <Percent color={color}>
           <i className={`fa-solid fa-caret-${arrow}`} />{' '}
           {percent.qText}
         </Percent>
