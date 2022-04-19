@@ -25,8 +25,6 @@ export default function App() {
   let profitTable = useGetQlikData(enigma.doc, 'xWWjCN').qlikData;
 
   if (profitTable) {
-    let profits = [];
-
     // Calculate total profit by summing each quarter profit
     const totalProfit = profitTable.reduce((prevValue, row) => {
       const rowRevenue = row[1].qNum;
