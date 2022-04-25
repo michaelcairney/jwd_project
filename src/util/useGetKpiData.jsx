@@ -5,11 +5,15 @@ export default function useGetQlikData(doc, objectId) {
 
   useEffect(() => {
     if (doc) {
+      // Get object using it's ID
+      let qObject;
+      doc.getObject(objectId).then((returnedObject) => {
+        qObject = returnedObject;
+        getData();
+        qObject.on('changed', getData);
+      });
       // Function for extracting the data from the qlik engine
       const getData = async () => {
-        // Get object using it's ID
-        const qObject = await doc.getObject(objectId);
-
         // Get layout to specify the data page width and height later on
         const layout = await qObject.getLayout();
 
@@ -27,7 +31,6 @@ export default function useGetQlikData(doc, objectId) {
         );
         setQlikData(hyperCubeData[0].qMatrix);
       };
-      getData();
     }
   }, [doc, objectId]);
 

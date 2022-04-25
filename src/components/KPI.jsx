@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import useGetKpiData from '../util/useGetKpiData';
 
 const Box = styled.section`
   display: flex;
@@ -11,6 +12,7 @@ const Box = styled.section`
   padding: 1rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 5px;
+  margin-left: 1rem;
   border-radius: 3px;
 `;
 
@@ -20,7 +22,30 @@ const Percent = styled.li`
   font-weight: 600;
 `;
 
-export default function KPI({ data, title }) {
+export default function KPI({ title, qlikApp, objectId }) {
+  let data = useGetKpiData(qlikApp?.doc, objectId).qlikData;
+
+  if (title === 'Total Profit' && data) {
+    console.log(data);
+    // Calculate total profit by summing each quarter profit
+    const totalProfit = data?.reduce((prevValue, row) => {
+      const rowRevenue = row[1].qNum;
+      const rowExpense = row[2].qNum;
+      const rowProfit = rowRevenue - rowExpense;
+      return (prevValue += rowProfit);
+    }, 0);
+
+    // Format total profit data so that the KPI component can use it
+    data = [
+      [
+        { qNum: totalProfit },
+        {
+          qText: data[0][3].qText,
+          qNum: data[0][3].qNum,
+        },
+      ],
+    ];
+  }
   if (data) {
     // Format data point to the desired specifications
     const value = Math.round(data[0][0].qNum / 1000000);

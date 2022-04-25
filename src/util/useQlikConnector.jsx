@@ -11,7 +11,7 @@ export default function useQlikConnect(appId) {
     const config = {
       host: 'cc-edapps.calibrateconsulting.com',
       isSecure: true,
-      appId
+      appId,
     };
 
     // Create session object, apply url and create WebSocket connection
@@ -32,6 +32,7 @@ export default function useQlikConnect(appId) {
       // Open doc with app ID
       const qDoc = await qGlobal.openDoc(config.appId);
       setDoc(qDoc);
+
     }
 
     connectToQlik();
