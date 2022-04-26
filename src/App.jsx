@@ -1,8 +1,8 @@
 import styled from 'styled-components';
-import useEnigma from './util/useEnigma';
-import KPI from './components/KPI';
+import useGetQlikData from './useGetQlikData';
+import KPI from './KPI';
 import Table from './components/Table';
-import useQlikConnect from './util/useQlikConnector';
+import useQlikConnect from './useQlikConnector';
 
 const ColContainer = styled.section`
   display: flex;
@@ -24,28 +24,25 @@ export default function App() {
   const enigma = useQlikConnect(appId);
 
   // Data for the table component
-  const tableData = useEnigma(enigma.doc, 'QJCCUM').qlikData;
+  const tableData = useGetQlikData(enigma.doc, 'QJCCUM').qlikData;
 
   // Data for total revenue KPI
-  const revenueData = useEnigma(enigma.doc, 'tWJJyZ').qlikData;
+  const revenueData = useGetQlikData(enigma.doc, 'tWJJyZ').qlikData;
 
   // Data for total expenses KPI
-  const expensesData = useEnigma(enigma.doc, 'eMsVVT').qlikData;
+  const expensesData = useGetQlikData(enigma.doc, 'eMsVVT').qlikData;
 
   // Data for total profit KPI
-  let profitData = useEnigma(enigma.doc, 'xWWjCN').qlikData;
+  let profitData = useGetQlikData(enigma.doc, 'xWWjCN').qlikData;
 
-  // Alter the total profit KPI calculation
-  if (profitData) {
-    let profits = [];
-
-    // Calculate profit for each quarter
-    profitData.forEach((row) =>
-      profits.push(row[1].qNum - row[2].qNum),
-    );
-
-    // Sum quarterly profts to get total profit
-    const totalProfit = profits.reduce((prev, curr) => prev + curr);
+  if (profitTable) {
+    // Calculate total profit by summing each quarter profit
+    const totalProfit = profitTable.reduce((prevValue, row) => {
+      const rowRevenue = row[1].qNum;
+      const rowExpense = row[2].qNum;
+      const rowProfit = rowRevenue - rowExpense;
+      return (prevValue += rowProfit);
+    }, 0);
 
     // Format total profit data so that the KPI component can use it
     profitData = [
