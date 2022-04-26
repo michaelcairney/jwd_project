@@ -1,7 +1,8 @@
 import styled from 'styled-components';
-import useGetQlikData from './useGetQlikData';
+import useGetQlikData from './util/useGetQlikData';
 import KPI from './components/KPI';
 import Table from './components/Table';
+import Waterfall from './components/Waterfall';
 import useQlikConnect from './util/useQlikConnector';
 
 const ColContainer = styled.section`
@@ -23,16 +24,19 @@ export default function App() {
   // Custom hook
   const enigma = useQlikConnect(appId);
 
-  // Data for the table component
+  // Data for table component
   const tableData = useGetQlikData(enigma.doc, 'QJCCUM').qlikData;
 
-  // Data for total revenue KPI
+  // Data for waterfall chart
+  const waterfallData = useGetQlikData(enigma.doc, 'GwVmqW').qlikData;
+
+  // Data for total revenue
   const revenueData = useGetQlikData(enigma.doc, 'tWJJyZ').qlikData;
 
-  // Data for total expenses KPI
+  // Data for total expenses
   const expensesData = useGetQlikData(enigma.doc, 'eMsVVT').qlikData;
 
-  // Data for total profit KPI
+  // Data for total profit
   let profitData = useGetQlikData(enigma.doc, 'xWWjCN').qlikData;
 
   if (profitData) {
@@ -62,7 +66,8 @@ export default function App() {
         <KPI data={expensesData} title='Total Expenses' />
         <KPI data={profitData} title='Total Profit' /> */}
       </RowContainer>
-      <Table data={tableData} />
+      {/* <Table data={tableData} /> */}
+      <Waterfall data={waterfallData} />
     </ColContainer>
   );
 }

@@ -30,6 +30,7 @@ const Item = styled.div`
   cursor: default;
   :nth-child(1) {
     position: sticky;
+    position: -webkit-sticky;
     top: 0;
     background: #3090df;
     color: white;
