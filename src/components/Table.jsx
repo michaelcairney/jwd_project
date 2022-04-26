@@ -91,10 +91,10 @@ export default function Table({ data }) {
   return (
     <Container>
       <Grid>
-        {keys.map((key) => (
-          <Column>
-            {tableData.map((row) => (
-              <Item>{row[key]}</Item>
+        {keys.map((key, index1) => (
+          <Column key={keys[index1]}>
+            {tableData.map((row, index2) => (
+              <Item key={Math.random()}>{row[key]}</Item>
             ))}
           </Column>
         ))}
