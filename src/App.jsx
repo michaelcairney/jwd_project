@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 import useGetQlikData from './useGetQlikData';
-import KPI from './KPI';
+import KPI from './components/KPI';
 import Table from './components/Table';
-import useQlikConnect from './useQlikConnector';
+import useQlikConnect from './util/useQlikConnector';
 
 const ColContainer = styled.section`
   display: flex;
@@ -35,9 +35,9 @@ export default function App() {
   // Data for total profit KPI
   let profitData = useGetQlikData(enigma.doc, 'xWWjCN').qlikData;
 
-  if (profitTable) {
+  if (profitData) {
     // Calculate total profit by summing each quarter profit
-    const totalProfit = profitTable.reduce((prevValue, row) => {
+    const totalProfit = profitData.reduce((prevValue, row) => {
       const rowRevenue = row[1].qNum;
       const rowExpense = row[2].qNum;
       const rowProfit = rowRevenue - rowExpense;
