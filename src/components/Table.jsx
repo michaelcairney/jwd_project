@@ -5,7 +5,7 @@ const Container = styled.main`
   height: 24rem;
   width: fit-content;
   overflow-y: scroll;
-  align-self: center;
+  margin-top: 2rem;
 `;
 
 const Grid = styled.section`

@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import { axisBottom, axisLeft } from 'd3';
 import { useEffect, useRef } from 'react';
 
-export default function Waterfall({ data }) {
+export default function Waterfall2({ data }) {
   const chartRef = useRef(null);
 
   // Define dimensions
@@ -12,30 +12,45 @@ export default function Waterfall({ data }) {
 
   useEffect(() => {
     if (data) {
+      let miscCosts = data[0][0].qNum;
+      data[0].forEach((item, index) => {
+        if (index > 0) {
+          miscCosts = miscCosts - item.qNum;
+        }
+      });
+
+      const newData = [
+        ...data[0].slice(0, 4),
+        { qNum: miscCosts },
+        ...data[0].slice(4, 5),
+      ];
+
       // Create array that will contain the cumulative sums for each quarter
       const cumulative = [0];
 
       // Logic to obtain cumulative sums
-      data.forEach((item) =>
-        cumulative.push(
-          item[1].qNum + cumulative[cumulative.length - 1],
-        ),
-      );
-
-      // grab the total sum
-      const total = cumulative[cumulative.length - 1];
-
-      // Create new data array with extra data point for the total sales
-      const newData = [
-        ...data,
-        [{ qText: 'Total' }, { qNum: total }],
-      ];
+      newData.reverse().forEach((item, index) => {
+        if (index < 4) {
+          cumulative.push(
+            item.qNum + cumulative[cumulative.length - 1],
+          );
+        }
+      });
+      newData.reverse();
+      cumulative.push(0);
 
       // Extract the quantative values
-      const measureData = newData.map((item) => item[1].qNum);
+      const measureData = data[0].map((item) => item.qNum);
 
       // Extract the qualitative values
-      const dimensionData = newData.map((item) => item[0].qText);
+      const dimensionData = [
+        'Revenue',
+        'Product Costs',
+        'Marketing Costs',
+        'Sales Costs',
+        'Misc Costs',
+        'Net Profit',
+      ];
 
       // Define x and y scales
       const xScale = d3
@@ -79,27 +94,30 @@ export default function Waterfall({ data }) {
           `translate(${margin.left}, ${margin.top} )`,
         )
         .attr('fill', (d, i) => {
-          if (i < 4) {
+          if (i < 1) {
             return '#3090df';
-          } else {
+          } else if (i > 4) {
             return 'mediumseagreen';
+          } else {
+            return '#bf3333'
           }
         })
         .attr('height', yScale.bandwidth())
-        .attr('y', (d, i) => yScale(d[0].qText))
+        .attr('y', (d, i) => yScale(dimensionData[i]))
 
         // Make the bars start at the previous bars value, except for the total
         .attr('x', (d, i) => {
-          if (d[0].qText !== 'Total') {
-            return xScale(cumulative[i]);
+          if (i > 0) {
+            return xScale(cumulative[5 - i]);
           }
         })
+
         .attr('width', 0)
         .style('border-radius', '5px')
         .transition()
         .duration(1000)
         .delay((d, i) => i * 100)
-        .attr('width', (d) => xScale(d[1].qNum));
+        .attr('width', (d) => xScale(d.qNum));
 
       // Add text displaying the values inside each bar
       bars
@@ -112,20 +130,28 @@ export default function Waterfall({ data }) {
         // Apply appropriate formatting
         .text(
           (d, i) =>
-            Math.round(d[1].qNum / 1000000).toLocaleString() + 'm',
+            Math.round(d.qNum / 1000000).toLocaleString() + 'm',
         )
         .attr('x', (d, i) => {
-          if (d[0].qText !== 'Total') {
-            return xScale(cumulative[i] + d[1].qNum / 2);
+          if (i < 1 || i > 3) {
+            return xScale(cumulative[5 - i] + d.qNum / 2);
           } else {
-            return xScale(cumulative[4] / 2);
+            return xScale(cumulative[5 - i]) - 25;
           }
         })
-        .attr('y', (d, i) => yScale(d[0].qText))
-        .style('fill', 'white')
+        .attr('y', (d, i) => yScale(dimensionData[i]))
+        .style('fill', (d, i) => {
+          if (i < 1 || i > 3) {
+            return 'white';
+          } else {
+            return 'black';
+          }
+        })
         .style('font-family', 'Heebo')
         .attr('font-weight', '200')
         .attr('text-anchor', 'middle');
+
+      cumulative.splice(5, 1, newData[0].qNum);
 
       // Add lines connecting the bars for the waterfall chart
       bars
@@ -136,20 +162,29 @@ export default function Waterfall({ data }) {
         .style('stroke-width', 1)
         .attr('opacity', '0.6')
         .attr('stroke-dasharray', '4 2')
-        .attr('x1', (d, i) => xScale(cumulative[i + 1]))
-        .attr('y1', (d, i) => yScale(d[0].qText) + yScale.bandwidth())
-        .attr('x2', (d, i) => xScale(cumulative[i + 1]))
-        .attr('y2', (d) => yScale(d[0].qText) + yScale.bandwidth())
+        .attr('x1', (d, i) => xScale(cumulative[5 - i]))
+        .attr(
+          'y1',
+          (d, i) => yScale(dimensionData[i]) + yScale.bandwidth(),
+        )
+        .attr('x2', (d, i) => xScale(cumulative[5 - i]))
+        .attr(
+          'y2',
+          (d, i) => yScale(dimensionData[i]) + yScale.bandwidth(),
+        )
         .transition()
         .duration(500)
         .delay(800)
-        .attr('y2', (d, i) => yScale(d[0].qText) + yScale.step());
+        .attr(
+          'y2',
+          (d, i) => yScale(dimensionData[i]) + yScale.step(),
+        );
 
       // Add title for the chart
       d3.select(chartRef.current)
         .append('text')
-        .text('Breakdown Total Sales By Quarter')
-        .attr('x', width / 3)
+        .text('Expenses and Revenue')
+        .attr('x', width / 2.3)
         .attr('y', height + margin.bottom - 10)
         .attr('font-size', '1.5rem')
         .style('font-family', 'Heebo')
